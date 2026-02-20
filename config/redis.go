@@ -14,21 +14,23 @@ var (
 )
 
 func ConnectRedis() {
-	addr := os.Getenv("REDIS_ADDR")
-	if addr == "" {
-		panic("❌ REDIS_ADDR is not set")
+	// read Redis URL
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		panic("❌ REDIS_URL is not set")
 	}
 
-	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: os.Getenv("REDIS_PASSWORD"),
-		DB:       0,
-	})
+	opt, err := redis.ParseURL(redisURL)
+	if err != nil {
+		panic(fmt.Sprintf("❌ invalid REDIS_URL: %v", err))
+	}
 
-	// Test connection
+	RedisClient = redis.NewClient(opt)
+
+	// test connection
 	res, err := RedisClient.Ping(Ctx).Result()
 	if err != nil {
-		panic("❌ Failed to connect to Redis at " + addr + ": " + err.Error())
+		panic(fmt.Sprintf("❌ failed to connect to Redis: %v", err))
 	}
 	fmt.Println("✅ Connected to Redis:", res)
 }
