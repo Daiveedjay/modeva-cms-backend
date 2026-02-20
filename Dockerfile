@@ -21,8 +21,12 @@ RUN go mod download
 # Copy the rest of the code
 COPY . .
 
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Expose port
 EXPOSE 8081
 
-# Air will be run via docker-compose command
-CMD ["air", "-c", ".air.toml"]
+# Run migrations and start app
+CMD ["/app/start.sh"]
