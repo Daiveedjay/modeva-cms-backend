@@ -189,7 +189,7 @@ func main() {
 
 	// ✅ Configure CORS properly for all content types including PDFs
 	corsCfg := cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001", "https://admin.modeva.shop", "https://modeva.shop"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001", "https://admin.modeva.shop", "https://modeva.shop", "http://admin.modeva.shop"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-CSRF-Token", "X-Requested-With"},
 		AllowCredentials: true,
