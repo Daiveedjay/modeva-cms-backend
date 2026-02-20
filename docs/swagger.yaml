@@ -1,0 +1,2781 @@
+basePath: /api/v1
+definitions:
+  auth_controller.OneTapRequest:
+    properties:
+      credential:
+        type: string
+    required:
+    - credential
+    type: object
+  models.AddAddressRequest:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      first_name:
+        type: string
+      is_default:
+        type: boolean
+      label:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      zip:
+        type: string
+    required:
+    - city
+    - country
+    - first_name
+    - label
+    - last_name
+    - state
+    - street
+    - zip
+    type: object
+  models.AddPaymentMethodRequest:
+    properties:
+      card_brand:
+        type: string
+      card_type:
+        description: Card fields
+        type: string
+      cardholder_name:
+        type: string
+      exp_month:
+        type: integer
+      exp_year:
+        type: integer
+      is_default:
+        type: boolean
+      last4:
+        type: string
+      paypal_email:
+        description: PayPal fields
+        type: string
+      paypal_payer_id:
+        type: string
+      provider:
+        description: '''stripe'', ''paypal'''
+        type: string
+      provider_payment_method_id:
+        type: string
+      type:
+        description: '''card'' or ''paypal'''
+        type: string
+    required:
+    - type
+    type: object
+  models.AddressResponse:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      created_at:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      is_default:
+        type: boolean
+      label:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      updated_at:
+        type: string
+      zip:
+        type: string
+    type: object
+  models.ApiResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/models.Pagination'
+      rate_limit:
+        $ref: '#/definitions/models.RateLimiter'
+      requested_entity:
+        type: string
+    type: object
+  models.AvailabilityData:
+    properties:
+      inStock:
+        type: integer
+      outOfStock:
+        type: integer
+    type: object
+  models.CMSCustomerDetail:
+    properties:
+      address:
+        $ref: '#/definitions/models.CustomerAddress'
+      avatar:
+        type: string
+      avg_order_value:
+        type: number
+      ban_reason:
+        type: string
+      email:
+        type: string
+      favorite_category:
+        type: string
+      id:
+        type: string
+      join_date:
+        type: string
+      last_order_date:
+        type: string
+      name:
+        type: string
+      orders:
+        type: integer
+      recent_orders:
+        items:
+          $ref: '#/definitions/models.CustomerOrder'
+        type: array
+      status:
+        type: string
+      suspended_reason:
+        type: string
+      suspended_until:
+        type: string
+      total_spent:
+        type: number
+    type: object
+  models.CMSCustomerListRow:
+    properties:
+      activity:
+        description: '"active" or "inactive"'
+        type: string
+      avatar:
+        type: string
+      ban_reason:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      join_date:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      orders:
+        type: integer
+      status:
+        type: string
+      suspended_reason:
+        type: string
+      suspended_until:
+        type: string
+      total_spent:
+        type: number
+    type: object
+  models.CMSOrderListRow:
+    properties:
+      created_at:
+        type: string
+      customer_email:
+        type: string
+      customer_id:
+        description: users.id
+        type: string
+      customer_name:
+        description: username or fallback
+        type: string
+      id:
+        description: orders.id
+        type: string
+      item_count:
+        description: COUNT(order_items.id)
+        type: integer
+      order_number:
+        description: ORD-2025-000001
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+      total_quantity:
+        description: SUM(order_items.quantity)
+        type: integer
+    type: object
+  models.Category:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/models.Category'
+        type: array
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      parentId:
+        type: string
+      parentName:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.CategoryData:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      parentId:
+        type: string
+      subcategories:
+        items:
+          $ref: '#/definitions/models.CategoryData'
+        type: array
+    type: object
+  models.CategoryRequest:
+    properties:
+      description:
+        example: Devices and gadgets
+        type: string
+      name:
+        example: Electronics
+        type: string
+      parentId:
+        example: "null"
+        type: string
+    type: object
+  models.CategoryStatsResponseItem:
+    properties:
+      activeParents:
+        type: integer
+      activeSubCategories:
+        type: integer
+      activeTotal:
+        type: integer
+      parents:
+        type: integer
+      percentageParents:
+        type: number
+      percentageSubCategories:
+        type: number
+      percentageTotal:
+        type: number
+      subCategories:
+        type: integer
+      total:
+        type: integer
+      type:
+        type: string
+    type: object
+  models.CreateOrderRequest:
+    properties:
+      address_id:
+        type: string
+      customer_notes:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.OrderItemInput'
+        minItems: 1
+        type: array
+      payment_method_id:
+        type: string
+    required:
+    - address_id
+    - items
+    - payment_method_id
+    type: object
+  models.CustomerAddress:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      zip_code:
+        type: string
+    type: object
+  models.CustomerOrder:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      order_number:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  models.DeleteCategoryOptions:
+    properties:
+      mode:
+        enum:
+        - cascade
+        - reassign
+        example: cascade
+        type: string
+      reassignments:
+        items:
+          $ref: '#/definitions/models.Reassignment'
+        type: array
+    required:
+    - mode
+    type: object
+  models.FilterMetadata:
+    properties:
+      availability:
+        $ref: '#/definitions/models.AvailabilityData'
+      categories:
+        items:
+          $ref: '#/definitions/models.CategoryData'
+        type: array
+      priceRange:
+        $ref: '#/definitions/models.PriceRangeData'
+    type: object
+  models.MediaURL:
+    properties:
+      order:
+        description: only relevant for "other" images
+        type: integer
+      url:
+        description: primary or other must have this
+        type: string
+    required:
+    - url
+    type: object
+  models.OrderHistoryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      item_count:
+        type: integer
+      order_number:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  models.OrderItem:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      order_id:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      status:
+        type: string
+      subtotal:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      variant_color:
+        type: string
+      variant_size:
+        type: string
+    type: object
+  models.OrderItemInput:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      variant_color:
+        type: string
+      variant_size:
+        type: string
+    required:
+    - product_id
+    - quantity
+    type: object
+  models.OrderStatsBreakdown:
+    properties:
+      count:
+        type: integer
+      description:
+        type: string
+    type: object
+  models.OrderStatsResponse:
+    properties:
+      cancelled:
+        $ref: '#/definitions/models.OrderStatsBreakdown'
+      change_percent_from_last_month:
+        type: number
+      completed:
+        $ref: '#/definitions/models.OrderStatsBreakdown'
+      current_month_total:
+        type: integer
+      last_month_total:
+        type: integer
+      pending:
+        $ref: '#/definitions/models.OrderStatsBreakdown'
+      processing:
+        $ref: '#/definitions/models.OrderStatsBreakdown'
+      shipped:
+        $ref: '#/definitions/models.OrderStatsBreakdown'
+      total_orders:
+        type: integer
+    type: object
+  models.OrderWithItems:
+    properties:
+      address_id:
+        type: string
+      address_snapshot:
+        description: JSONB as string
+        type: string
+      admin_notes:
+        type: string
+      confirmed_at:
+        type: string
+      created_at:
+        type: string
+      customer_notes:
+        type: string
+      delivered_at:
+        type: string
+      discount:
+        type: number
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.OrderItem'
+        type: array
+      order_number:
+        type: string
+      payment_method_id:
+        type: string
+      payment_method_last4:
+        type: string
+      payment_method_type:
+        type: string
+      shipped_at:
+        type: string
+      shipping_cost:
+        type: number
+      status:
+        type: string
+      subtotal:
+        type: number
+      tax:
+        type: number
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.Pagination:
+    properties:
+      limit:
+        example: 10
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 42
+        type: integer
+      total_pages:
+        example: 5
+        type: integer
+    type: object
+  models.PaymentMethodResponse:
+    properties:
+      card_brand:
+        description: '''visa'', ''mastercard'''
+        type: string
+      card_holder:
+        type: string
+      card_number:
+        description: '"•••• •••• •••• 4242"'
+        type: string
+      card_type:
+        description: Card fields
+        type: string
+      expiry:
+        description: '"12/26"'
+        type: string
+      id:
+        type: string
+      is_default:
+        type: boolean
+      paypal_email:
+        description: PayPal fields
+        type: string
+      status:
+        type: string
+      type:
+        description: '''card'' or ''paypal'''
+        type: string
+    type: object
+  models.PriceRangeData:
+    properties:
+      max:
+        type: number
+      min:
+        type: number
+    type: object
+  models.ProductMedia:
+    properties:
+      other:
+        items:
+          $ref: '#/definitions/models.MediaURL'
+        type: array
+      primary:
+        $ref: '#/definitions/models.MediaURL'
+    required:
+    - primary
+    type: object
+  models.ProductStatsResponseItem:
+    properties:
+      activeProducts:
+        type: integer
+      averagePrice:
+        type: number
+      draftProducts:
+        type: integer
+      lowStockProducts:
+        type: integer
+      percentageActive:
+        type: number
+      percentageLowStock:
+        type: number
+      taggedProducts:
+        type: integer
+      totalInventory:
+        type: integer
+      totalProducts:
+        type: integer
+      type:
+        type: string
+    type: object
+  models.RateLimiter:
+    properties:
+      limit:
+        type: integer
+      remaining:
+        type: integer
+      reset_at:
+        type: string
+      reset_in_seconds:
+        type: integer
+    type: object
+  models.Reassignment:
+    properties:
+      childId:
+        example: 001d6cc9-94b0-450f-8ce3-a7892c1752c7
+        type: string
+      newParentId:
+        example: df42b68d-0038-4d58-b52c-354e7c9a6656
+        type: string
+    type: object
+  models.UpdateAddressRequest:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      first_name:
+        type: string
+      label:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      zip:
+        type: string
+    type: object
+  models.UpdateCategoryRequest:
+    properties:
+      description:
+        type: string
+      name:
+        description: or just string
+        type: string
+      parentId:
+        description: pointer so you can tell null vs omitted
+        type: string
+    type: object
+  models.UpdateCategoryStatusRequest:
+    properties:
+      status:
+        example: Active
+        type: string
+    type: object
+  models.UpdateOrderStatusRequest:
+    properties:
+      admin_notes:
+        description: required if status=cancelled
+        type: string
+      status:
+        enum:
+        - pending
+        - processing
+        - shipped
+        - completed
+        - cancelled
+        type: string
+    required:
+    - status
+    type: object
+  models.UpdateOrderStatusResponse:
+    properties:
+      admin_notes:
+        type: string
+      id:
+        type: string
+      order_number:
+        type: string
+      status:
+        type: string
+    type: object
+  models.UserResponse:
+    properties:
+      avatar:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      emailVerified:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        description: ← Keep this
+        type: string
+      provider:
+        type: string
+    type: object
+  payment_controller.UpdatePaymentMethodRequest:
+    properties:
+      cardholder_name:
+        type: string
+      is_default:
+        type: boolean
+    type: object
+  product_controller.CleanupFolderRequest:
+    properties:
+      folderPath:
+        type: string
+    required:
+    - folderPath
+    type: object
+  product_controller.CreateProductRequest:
+    properties:
+      composition:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      inventory:
+        items:
+          type: integer
+        type: array
+      media:
+        $ref: '#/definitions/models.ProductMedia'
+      name:
+        type: string
+      price:
+        type: number
+      seo:
+        items:
+          type: integer
+        type: array
+      status:
+        type: string
+      subCategoryId:
+        type: string
+      tags:
+        items:
+          type: integer
+        type: array
+      variants:
+        items:
+          type: integer
+        type: array
+    required:
+    - description
+    - media
+    - name
+    - price
+    - subCategoryId
+    type: object
+  profile_controller.UpdateProfileRequest:
+    properties:
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: Modeva CMS Backend API Documentation
+  title: Modeva CMS API
+  version: "1.0"
+paths:
+  /admin/customers:
+    get:
+      consumes:
+      - application/json
+      description: Fetch customers for CMS table view. Location is derived from default
+        address (addresses.is_default=true) else "No address yet". Includes orders
+        count and total spent. Activity status based on last order (inactive if >
+        90.5 days).
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page (max 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name or email (partial match)
+        in: query
+        name: q
+        type: string
+      - description: Filter by status
+        enum:
+        - active
+        - suspended
+        - deleted
+        - banned
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.CMSCustomerListRow'
+                  type: array
+                meta:
+                  $ref: '#/definitions/models.Pagination'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get customers (CMS)
+      tags:
+      - Admin - Customers
+  /admin/customers/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch detailed profile information for a specific customer including
+        orders, addresses, and payment methods
+      parameters:
+      - description: Customer ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CMSCustomerDetail'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get customer profile details
+      tags:
+      - Admin - Customers
+  /admin/orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all orders for CMS (admin) with customer details and pagination.
+        Supports optional filtering by status and search.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page (max 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by order status (pending, confirmed, processing, shipped,
+          delivered, cancelled, refunded)
+        in: query
+        name: status
+        type: string
+      - description: Search by order number, customer email, or customer name
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.CMSOrderListRow'
+                  type: array
+                meta:
+                  $ref: '#/definitions/models.Pagination'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get orders (CMS)
+      tags:
+      - Admin - Orders
+  /admin/orders/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update an order status. admin_notes is optional for all statuses,
+        but required when status is cancelled (cancellation reason).
+      parameters:
+      - description: Order ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UpdateOrderStatusResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Update order status (CMS)
+      tags:
+      - Admin - Orders
+  /admin/orders/search:
+    get:
+      consumes:
+      - application/json
+      description: Search orders by customer name/email, order number, status, price
+        (exact/range), date range. Supports pagination.
+      parameters:
+      - description: Generic search (matches order number, customer name, email)
+        in: query
+        name: q
+        type: string
+      - description: Order number (partial match)
+        in: query
+        name: order_number
+        type: string
+      - description: Customer name (partial match)
+        in: query
+        name: customer
+        type: string
+      - description: Customer email (partial match)
+        in: query
+        name: email
+        type: string
+      - description: Status (pending|processing|shipped|completed|cancelled)
+        in: query
+        name: status
+        type: string
+      - description: Exact total amount
+        in: query
+        name: price
+        type: number
+      - description: Min total amount
+        in: query
+        name: min_price
+        type: number
+      - description: Max total amount
+        in: query
+        name: max_price
+        type: number
+      - description: Created from (RFC3339 or YYYY-MM-DD)
+        in: query
+        name: created_from
+        type: string
+      - description: Created to (RFC3339 or YYYY-MM-DD)
+        in: query
+        name: created_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page (max 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  properties:
+                    orders:
+                      items:
+                        $ref: '#/definitions/models.CMSOrderListRow'
+                      type: array
+                  type: object
+                meta:
+                  $ref: '#/definitions/models.Pagination'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Search orders (CMS)
+      tags:
+      - Admin - Orders
+  /admin/orders/stats:
+    get:
+      consumes:
+      - application/json
+      description: Returns all-time total orders + per-status breakdown, plus current
+        month total and % change vs last month.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.OrderStatsResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get order stats (CMS)
+      tags:
+      - Admin - Orders
+  /auth/google/callback:
+    get:
+      description: Handles the callback from Google OAuth. Verifies the state token,
+        exchanges the authorization code, retrieves user info, creates/updates the
+        user in the database, issues a JWT cookie, and redirects the user back to
+        the frontend.
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Redirect to frontend after successful login
+        "400":
+          description: Invalid state or missing authorization code
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized or token exchange failure
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Google OAuth callback
+      tags:
+      - Auth - Google OAuth
+  /auth/google/login:
+    get:
+      description: Starts the Google OAuth flow by generating a state token, storing
+        it in a secure cookie, and redirecting the user to Google's OAuth consent
+        page.
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Temporary redirect to Google OAuth
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Redirect to Google OAuth
+      tags:
+      - Auth - Google OAuth
+  /auth/google/one-tap:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user using a Google One Tap credential, creates
+        or updates the user record, sets an auth cookie, and returns user data.
+      parameters:
+      - description: Google One Tap credential payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/auth_controller.OneTapRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Authentication successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or CSRF verification failed
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Invalid credential
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Failed to create user or generate token
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Google One Tap authentication
+      tags:
+      - Auth - Google OAuth
+  /auth/logout:
+    post:
+      description: Logs out the authenticated user by clearing the auth_token and
+        user_data cookies.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logged out
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - Auth
+  /categories:
+    get:
+      description: Retrieve parent categories and their subcategories with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get paginated categories with subcategories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Add a new category (parentId optional — if provided, this becomes
+        a subcategory)
+      parameters:
+      - description: Category input
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.CategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new category or subcategory
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      description: Delete a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a category
+      tags:
+      - categories
+    get:
+      description: Retrieve a single category by its ID, including its immediate children
+        (if any).
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a category by ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Update category name, description, and optionally parent_id. If
+        parent_id is same as existing, ignores it.
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a category
+      tags:
+      - categories
+  /categories/{id}/delete-with-options:
+    post:
+      consumes:
+      - application/json
+      description: Delete a category and either cascade delete its subcategories or
+        reassign them to new parents.
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Delete options
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteCategoryOptions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category deleted successfully (cascade or reassign)
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Invalid request body or bad input
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error or deletion failed
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Delete a category with options
+      tags:
+      - categories
+  /categories/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Change a category's status (Active or Inactive) and cascade to
+        subcategories
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCategoryStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Update category status
+      tags:
+      - categories
+  /categories/parents:
+    get:
+      description: Retrieve categories that have no parent (top-level categories only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get all parent categories
+      tags:
+      - categories
+  /categories/search:
+    get:
+      description: Search parent categories by name or description (case-insensitive).
+        Returns paginated parents with their subcategories.
+      parameters:
+      - description: Search keyword
+        in: query
+        name: query
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Search categories (with subcategories)
+      tags:
+      - categories
+  /categories/stats:
+    get:
+      description: 'Returns stats: total categories (parents & subcategories), active
+        ones, percentages'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoryStatsResponseItem'
+            type: array
+      summary: Get category statistics
+      tags:
+      - categories
+  /categories/sub:
+    get:
+      description: Retrieve categories that have a parent (sub-categories only) with
+        full path
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get all sub categories
+      tags:
+      - categories
+  /payment-methods:
+    post:
+      consumes:
+      - application/json
+      description: Adds a payment method for the authenticated user. Supports card
+        and PayPal types. Card type requires card details; PayPal requires PayPal
+        email.
+      parameters:
+      - description: Payment method payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddPaymentMethodRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Payment method added successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Invalid or missing request fields
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Failed to add payment method
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Add a new payment method
+      tags:
+      - Payment Methods
+  /products:
+    get:
+      description: Retrieve a paginated list of all products
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by subcategory
+        in: query
+        name: sub_category
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product with Cloudinary URLs (optimized flow)
+      parameters:
+      - description: Product details with Cloudinary URLs
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/product_controller.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Create a new product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Delete a product by ID and its associated Cloudinary folder
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      description: Retrieve a single product and its related details
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get a product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update product details by ID with support for both text and image
+        updates
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product name
+        in: formData
+        name: name
+        type: string
+      - description: Product description
+        in: formData
+        name: description
+        type: string
+      - description: Product price
+        in: formData
+        name: price
+        type: number
+      - description: Sub category ID
+        in: formData
+        name: subCategoryId
+        type: string
+      - description: Product status
+        in: formData
+        name: status
+        type: string
+      - description: New primary product image
+        in: formData
+        name: primaryImage
+        type: file
+      - description: Existing primary image URL (if not changing)
+        in: formData
+        name: primaryImageUrl
+        type: string
+      - description: New other product images (multiple)
+        in: formData
+        name: otherImages
+        type: file
+      - description: JSON array of existing other images to keep
+        in: formData
+        name: existingOtherImages
+        type: string
+      - description: Product variants JSON
+        in: formData
+        name: variants
+        type: string
+      - description: Product inventory JSON
+        in: formData
+        name: inventory
+        type: string
+      - description: SEO details JSON
+        in: formData
+        name: seo
+        type: string
+      - description: Product composition JSON
+        in: formData
+        name: composition
+        type: string
+      - description: Product tags JSON
+        in: formData
+        name: tags
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Update an existing product
+      tags:
+      - products
+  /products/cleanup-folder:
+    post:
+      consumes:
+      - application/json
+      description: Deletes entire product folder when backend save fails after upload
+        succeeds
+      parameters:
+      - description: Folder path to delete
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/product_controller.CleanupFolderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Delete orphaned product folder from Cloudinary
+      tags:
+      - cloudinary
+  /products/search:
+    get:
+      description: Search products by name, description, or tags (case-insensitive).
+        Returns paginated results with subcategory info.
+      parameters:
+      - description: Search keyword
+        in: query
+        name: query
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Search products
+      tags:
+      - products
+  /products/stats:
+    get:
+      description: Returns overall product stats including low-stock counts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ProductStatsResponseItem'
+            type: array
+      summary: Get product statistics
+      tags:
+      - products
+  /store/categories:
+    get:
+      description: Get all active categories with product counts for storefront
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get storefront categories
+      tags:
+      - store
+  /store/categories/{id}:
+    get:
+      description: Get single category with subcategories and product count
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get category details
+      tags:
+      - store
+  /store/filters/metadata:
+    get:
+      description: Returns availability counts, categories, and price range for storefront
+        filters
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.FilterMetadata'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get all filter metadata
+      tags:
+      - store
+  /store/products:
+    get:
+      description: Get paginated products for storefront with optional search and
+        filtering
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - collectionFormat: csv
+        description: Category IDs (repeatable ?category=ID&category=ID)
+        in: query
+        items:
+          type: string
+        name: category
+        type: array
+      - collectionFormat: csv
+        description: Subcategory IDs (repeatable ?subcategory=ID&subcategory=ID)
+        in: query
+        items:
+          type: string
+        name: subcategory
+        type: array
+      - collectionFormat: csv
+        description: Sizes (repeatable ?size=XS&size=S)
+        in: query
+        items:
+          type: string
+        name: size
+        type: array
+      - description: Availability filter
+        enum:
+        - in_stock
+        - out_of_stock
+        - inStock
+        - outOfStock
+        in: query
+        name: availability
+        type: string
+      - description: Minimum price
+        in: query
+        name: minPrice
+        type: number
+      - description: Maximum price
+        in: query
+        name: maxPrice
+        type: number
+      - default: newest
+        description: Sort by field
+        enum:
+        - price
+        - name
+        - newest
+        - popular
+        in: query
+        name: sortBy
+        type: string
+      - default: desc
+        description: Sort order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sortOrder
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get storefront products
+      tags:
+      - store
+  /store/products/{id}:
+    get:
+      description: Get detailed product information by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get single product details for storefront
+      tags:
+      - store
+  /store/products/filters:
+    get:
+      description: Get all available filters for products (categories, sizes, price
+        range)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get available product filters
+      tags:
+      - store
+  /store/products/search:
+    get:
+      description: Search products by name, description, or category
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Search products
+      tags:
+      - store
+  /storefront/products:
+    get:
+      description: Retrieve active storefront products with optional search, category,
+        subcategory, size, colour, availability, price range, and sorting filters.
+      parameters:
+      - description: Search query (name or description)
+        in: query
+        name: q
+        type: string
+      - collectionFormat: csv
+        description: Parent category IDs (repeatable)
+        in: query
+        items:
+          type: string
+        name: category
+        type: array
+      - collectionFormat: csv
+        description: Subcategory IDs (repeatable)
+        in: query
+        items:
+          type: string
+        name: subcategory
+        type: array
+      - collectionFormat: csv
+        description: Sizes (repeatable)
+        in: query
+        items:
+          type: string
+        name: size
+        type: array
+      - collectionFormat: csv
+        description: Colours (repeatable)
+        in: query
+        items:
+          type: string
+        name: color
+        type: array
+      - description: Availability filter (in_stock | out_of_stock)
+        in: query
+        name: availability
+        type: string
+      - description: Minimum price
+        in: query
+        name: minPrice
+        type: number
+      - description: Maximum price
+        in: query
+        name: maxPrice
+        type: number
+      - default: newest
+        description: Sort by field (newest, price, etc.)
+        in: query
+        name: sortBy
+        type: string
+      - default: desc
+        description: Sort order (asc | desc)
+        in: query
+        name: sortOrder
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 12
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Products with filters fetched successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get storefront products with filters
+      tags:
+      - Storefront - Products
+  /storefront/products/basic:
+    get:
+      description: Retrieve active storefront products using only pagination and sorting
+        (no category, size, colour, or price filters).
+      parameters:
+      - default: newest
+        description: Sort by field (newest, price, etc.)
+        in: query
+        name: sortBy
+        type: string
+      - default: desc
+        description: Sort order (asc | desc)
+        in: query
+        name: sortOrder
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 12
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Products fetched successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      summary: Get storefront products (no filters)
+      tags:
+      - Storefront - Products
+  /user/addresses:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all active addresses for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  properties:
+                    addresses:
+                      items:
+                        $ref: '#/definitions/models.AddressResponse'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user addresses
+      tags:
+      - User - Addresses
+    post:
+      consumes:
+      - application/json
+      description: Add a new address for the authenticated user
+      parameters:
+      - description: Address details
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Address added successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  properties:
+                    id:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Add new address
+      tags:
+      - User - Addresses
+  /user/addresses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an address (sets status to 'deleted')
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Address deleted successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Address not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete address
+      tags:
+      - User - Addresses
+    patch:
+      consumes:
+      - application/json
+      description: Update specific fields of an address
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Address updated successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Permission denied
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Address not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Update address
+      tags:
+      - User - Addresses
+  /user/addresses/{id}/default:
+    put:
+      consumes:
+      - application/json
+      description: Set an address as the default for the user
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Default address updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  properties:
+                    id:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Address not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Set default address
+      tags:
+      - User - Addresses
+  /user/orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all orders for the authenticated user with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page (max 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  properties:
+                    orders:
+                      items:
+                        $ref: '#/definitions/models.OrderHistoryResponse'
+                      type: array
+                  type: object
+                meta:
+                  $ref: '#/definitions/models.Pagination'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get order history
+      tags:
+      - User - Orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order from cart items with payment and address
+      parameters:
+      - description: Order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Order created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  properties:
+                    order_id:
+                      type: string
+                    order_number:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Payment method or address not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Create new order (checkout)
+      tags:
+      - User - Orders
+  /user/orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve complete order details including all items
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.OrderWithItems'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: Permission denied
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get order details
+      tags:
+      - User - Orders
+  /user/payment-methods:
+    get:
+      description: Retrieves all active payment methods for the authenticated user,
+        including cards and PayPal accounts. Card details are partially masked.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment methods retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.PaymentMethodResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Failed to retrieve payment methods
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user's payment methods
+      tags:
+      - User - Payment Methods
+  /user/payment-methods/{id}:
+    delete:
+      description: Soft deletes a user's payment method by marking it as 'deleted'.
+        User must own the payment method.
+      parameters:
+      - description: Payment method ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment method deleted successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Payment method ID missing
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: User does not own this payment method
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Payment method not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a payment method
+      tags:
+      - User - Payment Methods
+    patch:
+      consumes:
+      - application/json
+      description: Updates non-sensitive fields of a user's payment method, such as
+        is_default and cardholder_name. Sensitive card data cannot be updated via
+        this endpoint.
+      parameters:
+      - description: Payment method ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payment method fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/payment_controller.UpdatePaymentMethodRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment method updated successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Invalid request body or no fields to update
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: User does not own this payment method
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Payment method not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Failed to update payment method
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a payment method
+      tags:
+      - User - Payment Methods
+  /user/payment-methods/{id}/default:
+    put:
+      description: Marks a specific active payment method as the default for the authenticated
+        user. Other payment methods will be unset by a database trigger.
+      parameters:
+      - description: Payment method ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Default payment method updated successfully
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "400":
+          description: Payment method ID is required
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "403":
+          description: User does not own this payment method
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Payment method not found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "500":
+          description: Failed to set default payment method
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Set default payment method
+      tags:
+      - User - Payment Methods
+  /user/profile:
+    get:
+      description: Get authenticated user's profile information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update authenticated user's profile (name, phone)
+      parameters:
+      - description: Update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/profile_controller.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - user
+schemes:
+- http
+swagger: "2.0"
