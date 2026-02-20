@@ -1,8 +1,3 @@
-// ════════════════════════════════════════════════════════════
-// Path: config/database.go
-// Database connections for CMS and Ecommerce
-// ════════════════════════════════════════════════════════════
-
 package config
 
 import (
@@ -19,35 +14,31 @@ import (
 )
 
 var (
-	// pgx connections (keep for raw SQL if needed)
 	CmsDB       *pgxpool.Pool
 	EcommerceDB *pgxpool.Pool
 
-	// GORM connections
 	CmsGorm       *gorm.DB
 	EcommerceGorm *gorm.DB
 )
 
-// InitDB initializes both database connections (pgx + GORM)
 func InitDB() {
 	initPgx()
 	initGORM()
 }
 
-// initPgx initializes pgx connections
 func initPgx() {
-	// Get consistent connection parameters
-	dbHost := getEnv("DB_HOST", "localhost")
-	dbUser := getEnv("DB_USER", "postgres")
-	dbPassword := getEnv("DB_PASSWORD", "daiveed")
-	dbPort := getEnv("DB_PORT", "5432")
-
-	// Initialize CMS database
+	// CMS - use Neon URL if provided
 	cmsURL := os.Getenv("CMS_DB_URL")
 	if cmsURL == "" {
-		cmsURL = fmt.Sprintf("postgres://%s:%s@%s:%s/modeva_cms_backend?sslmode=disable",
-			dbUser, dbPassword, dbHost, dbPort)
-		log.Printf("⚠️  CMS_DB_URL not set, using default")
+		// fallback to local
+		cmsURL = fmt.Sprintf(
+			"postgres://%s:%s@%s:%s/modeva_cms_backend?sslmode=disable",
+			getEnv("DB_USER", "postgres"),
+			getEnv("DB_PASSWORD", ""),
+			getEnv("DB_HOST", "localhost"),
+			getEnv("DB_PORT", "5432"),
+		)
+		log.Println("⚠️ CMS_DB_URL not set, using local default")
 	}
 
 	var err error
@@ -62,12 +53,17 @@ func initPgx() {
 
 	log.Println("✅ CMS database connected (pgx)")
 
-	// Initialize Ecommerce database
+	// Ecommerce - same pattern
 	ecommerceURL := os.Getenv("ECOMMERCE_DB_URL")
 	if ecommerceURL == "" {
-		ecommerceURL = fmt.Sprintf("postgres://%s:%s@%s:%s/modeva_ecommerce?sslmode=disable",
-			dbUser, dbPassword, dbHost, dbPort)
-		log.Printf("⚠️  ECOMMERCE_DB_URL not set, using default")
+		ecommerceURL = fmt.Sprintf(
+			"postgres://%s:%s@%s:%s/modeva_ecommerce?sslmode=disable",
+			getEnv("DB_USER", "postgres"),
+			getEnv("DB_PASSWORD", ""),
+			getEnv("DB_HOST", "localhost"),
+			getEnv("DB_PORT", "5432"),
+		)
+		log.Println("⚠️ ECOMMERCE_DB_URL not set, using local default")
 	}
 
 	EcommerceDB, err = pgxpool.New(context.Background(), ecommerceURL)
@@ -82,49 +78,54 @@ func initPgx() {
 	log.Println("✅ Ecommerce database connected (pgx)")
 }
 
-// initGORM initializes GORM connections
 func initGORM() {
-	// Get environment or use defaults
-	dbHost := getEnv("DB_HOST", "localhost")
-	dbUser := getEnv("DB_USER", "postgres")
-	dbPassword := getEnv("DB_PASSWORD", "daiveed")
-	dbPort := getEnv("DB_PORT", "5432")
-
-	// CMS Database DSN
-	cmsDSN := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
-		dbHost, dbUser, dbPassword, "modeva_cms_backend", dbPort,
-	)
-
-	// Configure GORM logger (show SQL in development)
+	// Shared logger config
 	gormLogger := logger.Default.LogMode(logger.Info)
 	if os.Getenv("APP_ENV") == "production" {
 		gormLogger = logger.Default.LogMode(logger.Silent)
 	}
 
+	// CMS GORM: prefer full URL
+	var cmsDSN string
+	if os.Getenv("CMS_DB_URL") != "" {
+		cmsDSN = os.Getenv("CMS_DB_URL")
+	} else {
+		cmsDSN = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=modeva_cms_backend port=%s sslmode=disable TimeZone=UTC",
+			getEnv("DB_HOST", "localhost"),
+			getEnv("DB_USER", "postgres"),
+			getEnv("DB_PASSWORD", ""),
+			getEnv("DB_PORT", "5432"),
+		)
+		log.Println("⚠️ CMS_DB_URL not set, using local GORM default")
+	}
 	var err error
 	CmsGorm, err = gorm.Open(postgres.Open(cmsDSN), &gorm.Config{
-		Logger: gormLogger,
-		NowFunc: func() time.Time {
-			return time.Now().UTC()
-		},
+		Logger:  gormLogger,
+		NowFunc: func() time.Time { return time.Now().UTC() },
 	})
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to CMS database with GORM: %v", err)
 	}
 	log.Println("✅ CMS database connected (GORM)")
 
-	// Ecommerce Database DSN
-	ecommerceDSN := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
-		dbHost, dbUser, dbPassword, "modeva_ecommerce", dbPort,
-	)
-
+	// Ecommerce GORM: same
+	var ecommerceDSN string
+	if os.Getenv("ECOMMERCE_DB_URL") != "" {
+		ecommerceDSN = os.Getenv("ECOMMERCE_DB_URL")
+	} else {
+		ecommerceDSN = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=modeva_ecommerce port=%s sslmode=disable TimeZone=UTC",
+			getEnv("DB_HOST", "localhost"),
+			getEnv("DB_USER", "postgres"),
+			getEnv("DB_PASSWORD", ""),
+			getEnv("DB_PORT", "5432"),
+		)
+		log.Println("⚠️ ECOMMERCE_DB_URL not set, using local GORM default")
+	}
 	EcommerceGorm, err = gorm.Open(postgres.Open(ecommerceDSN), &gorm.Config{
-		Logger: gormLogger,
-		NowFunc: func() time.Time {
-			return time.Now().UTC()
-		},
+		Logger:  gormLogger,
+		NowFunc: func() time.Time { return time.Now().UTC() },
 	})
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to Ecommerce database with GORM: %v", err)
@@ -132,7 +133,6 @@ func initGORM() {
 	log.Println("✅ Ecommerce database connected (GORM)")
 }
 
-// CloseDB closes both database connections
 func CloseDB() {
 	if CmsDB != nil {
 		CmsDB.Close()
@@ -143,7 +143,6 @@ func CloseDB() {
 		log.Println("✅ Ecommerce database connection closed (pgx)")
 	}
 
-	// Close GORM connections
 	if CmsGorm != nil {
 		sqlDB, _ := CmsGorm.DB()
 		if sqlDB != nil {
@@ -160,17 +159,14 @@ func CloseDB() {
 	}
 }
 
-// WithTimeout creates a context with a 5-second timeout
 func WithTimeout() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), 5*time.Second)
 }
 
-// WithCustomTimeout creates a context with a custom timeout duration
 func WithCustomTimeout(duration time.Duration) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), duration)
 }
 
-// getEnv gets environment variable or returns default
 func getEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
