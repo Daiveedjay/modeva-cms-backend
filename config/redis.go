@@ -17,6 +17,12 @@ var (
 func ConnectRedis() {
 	// read Redis URL
 	redisURL := os.Getenv("REDIS_URL")
+
+	// CRITICAL DEBUG - Shows what Railway is actually injecting
+	log.Printf("🔍 DEBUG: REDIS_URL = '%s'", redisURL)
+	log.Printf("🔍 DEBUG: REDIS_URL length = %d", len(redisURL))
+	log.Printf("🔍 DEBUG: REDIS_URL is empty = %v", redisURL == "")
+
 	if redisURL == "" {
 		// Default to local Redis for development
 		redisURL = "redis://localhost:6379"
@@ -27,6 +33,10 @@ func ConnectRedis() {
 	if err != nil {
 		panic(fmt.Sprintf("❌ invalid REDIS_URL: %v", err))
 	}
+
+	// DEBUG - Show parsed connection details
+	log.Printf("🔍 DEBUG: Connecting to address: %s", opt.Addr)
+	log.Printf("🔍 DEBUG: Using password: %s", opt.Password)
 
 	RedisClient = redis.NewClient(opt)
 
