@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/redis/go-redis/v9"
@@ -17,7 +18,9 @@ func ConnectRedis() {
 	// read Redis URL
 	redisURL := os.Getenv("REDIS_URL")
 	if redisURL == "" {
-		panic("❌ REDIS_URL is not set")
+		// Default to local Redis for development
+		redisURL = "redis://localhost:6379"
+		log.Println("⚠️  REDIS_URL not set, using local Redis:", redisURL)
 	}
 
 	opt, err := redis.ParseURL(redisURL)
