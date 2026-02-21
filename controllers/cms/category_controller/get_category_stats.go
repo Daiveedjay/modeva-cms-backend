@@ -2,10 +2,19 @@ package category_controller
 
 import (
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/config"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/models"
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	statsCache     *models.CategoryStatsResponseItem
+	statsCacheTime time.Time
+	statsCacheMu   sync.RWMutex
+	statsCacheTTL  = 5 * time.Minute
 )
 
 // GetCategoryStats godoc
@@ -17,6 +26,17 @@ import (
 // @Failure 500 {object} models.ApiResponse
 // @Router /api/v1/admin/categories/stats [get]
 func GetCategoryStats(c *gin.Context) {
+	// Check cache first
+	statsCacheMu.RLock()
+	if statsCache != nil && time.Since(statsCacheTime) < statsCacheTTL {
+		cached := *statsCache
+		statsCacheMu.RUnlock()
+		c.JSON(http.StatusOK, models.SuccessResponse(c, "Category stats fetched successfully", cached))
+		return
+	}
+	statsCacheMu.RUnlock()
+
+	// Cache miss — hit DB
 	ctx, cancel := config.WithTimeout()
 	defer cancel()
 
@@ -44,6 +64,12 @@ func GetCategoryStats(c *gin.Context) {
 		PercentageActiveParents:       computePct(stats.ActiveParentCategories, stats.ParentCategories),
 		PercentageActiveSubCategories: computePct(stats.ActiveSubCategories, stats.SubCategories),
 	}
+
+	// Store in cache
+	statsCacheMu.Lock()
+	statsCache = &response
+	statsCacheTime = time.Now()
+	statsCacheMu.Unlock()
 
 	c.JSON(http.StatusOK, models.SuccessResponse(c, "Category stats fetched successfully", response))
 }
