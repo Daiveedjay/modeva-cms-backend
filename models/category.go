@@ -114,3 +114,19 @@ type CategoryWithPath struct {
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
 }
+
+// CategoryStats represents the cached statistics table
+type CategoryStats struct {
+	ID                     uuid.UUID `json:"id" gorm:"type:uuid;primaryKey"`
+	TotalCategories        int       `json:"total_categories"`
+	ParentCategories       int       `json:"parent_categories"`
+	SubCategories          int       `json:"sub_categories"`
+	ActiveCategories       int       `json:"active_categories"`
+	ActiveParentCategories int       `json:"active_parent_categories"`
+	ActiveSubCategories    int       `json:"active_sub_categories"`
+	UpdatedAt              time.Time `json:"updated_at"`
+}
+
+func (CategoryStats) TableName() string {
+	return "category_stats"
+}

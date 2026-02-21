@@ -20,80 +20,30 @@ func GetCategoryStats(c *gin.Context) {
 	ctx, cancel := config.WithTimeout()
 	defer cancel()
 
-	var totalCategories int64
-	if err := config.CmsGorm.WithContext(ctx).
-		Model(&models.Category{}).
-		Count(&totalCategories).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count categories"))
+	var stats models.CategoryStats
+	if err := config.CmsGorm.WithContext(ctx).First(&stats).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to fetch category stats"))
 		return
 	}
 
-	var parentCategories int64
-	if err := config.CmsGorm.WithContext(ctx).
-		Model(&models.Category{}).
-		Where("parent_id IS NULL").
-		Count(&parentCategories).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count parent categories"))
-		return
-	}
-
-	var subCategories int64
-	if err := config.CmsGorm.WithContext(ctx).
-		Model(&models.Category{}).
-		Where("parent_id IS NOT NULL").
-		Count(&subCategories).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count subcategories"))
-		return
-	}
-
-	var activeCategories int64
-	if err := config.CmsGorm.WithContext(ctx).
-		Model(&models.Category{}).
-		Where("status = ?", "Active").
-		Count(&activeCategories).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count active categories"))
-		return
-	}
-
-	var activeParentCategories int64
-	if err := config.CmsGorm.WithContext(ctx).
-		Model(&models.Category{}).
-		Where("parent_id IS NULL AND status = ?", "Active").
-		Count(&activeParentCategories).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count active parent categories"))
-		return
-	}
-
-	var activeSubCategories int64
-	if err := config.CmsGorm.WithContext(ctx).
-		Model(&models.Category{}).
-		Where("parent_id IS NOT NULL AND status = ?", "Active").
-		Count(&activeSubCategories).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count active subcategories"))
-		return
-	}
-
-	computePct := func(numerator, denominator int64) float64 {
+	computePct := func(numerator, denominator int) float64 {
 		if denominator == 0 {
 			return 0
 		}
 		return (float64(numerator) / float64(denominator)) * 100
 	}
 
-	stats := models.CategoryStatsResponseItem{
-		TotalCategories:               int(totalCategories),
-		ParentCategories:              int(parentCategories),
-		SubCategories:                 int(subCategories),
-		ActiveCategories:              int(activeCategories),
-		ActiveParentCategories:        int(activeParentCategories),
-		ActiveSubCategories:           int(activeSubCategories),
-		PercentageActiveCategories:    computePct(activeCategories, totalCategories),
-		PercentageActiveParents:       computePct(activeParentCategories, parentCategories),
-		PercentageActiveSubCategories: computePct(activeSubCategories, subCategories),
+	response := models.CategoryStatsResponseItem{
+		TotalCategories:               stats.TotalCategories,
+		ParentCategories:              stats.ParentCategories,
+		SubCategories:                 stats.SubCategories,
+		ActiveCategories:              stats.ActiveCategories,
+		ActiveParentCategories:        stats.ActiveParentCategories,
+		ActiveSubCategories:           stats.ActiveSubCategories,
+		PercentageActiveCategories:    computePct(stats.ActiveCategories, stats.TotalCategories),
+		PercentageActiveParents:       computePct(stats.ActiveParentCategories, stats.ParentCategories),
+		PercentageActiveSubCategories: computePct(stats.ActiveSubCategories, stats.SubCategories),
 	}
 
-	c.JSON(
-		http.StatusOK,
-		models.SuccessResponse(c, "Category stats fetched successfully", stats),
-	)
+	c.JSON(http.StatusOK, models.SuccessResponse(c, "Category stats fetched successfully", response))
 }

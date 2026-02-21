@@ -50,6 +50,7 @@ migrate:
 	@echo "✅ Migrations complete"
 
 # Run migrations on Neon (production databases)
+# Run migrations on Neon (production databases)
 migrate-neon:
 	@echo "📦 Running migrations on Neon..."
 	@echo "⚠️  This will run migrations on your PRODUCTION databases!"
@@ -60,12 +61,8 @@ migrate-neon:
 	fi
 	@read -p "Continue? [y/N]: " confirm; \
 	if [ "$$confirm" = "y" ]; then \
-		echo "Initializing CMS migration system..."; \
-		wsl -d Ubuntu bash -lc "cd /mnt/c/Users/Jajad/Desktop/MODEVA/CMS/modeva-cms-backend && migrate -path ./migrations/cms -database '$(NEON_CMS_DB_URL)' force 0" 2>/dev/null || true; \
 		echo "Running CMS migrations..."; \
 		wsl -d Ubuntu bash -lc "cd /mnt/c/Users/Jajad/Desktop/MODEVA/CMS/modeva-cms-backend && migrate -path ./migrations/cms -database '$(NEON_CMS_DB_URL)' up" || echo "  ⚠️  CMS: Migration issue (may already be up-to-date)"; \
-		echo "Initializing Ecommerce migration system..."; \
-		wsl -d Ubuntu bash -lc "cd /mnt/c/Users/Jajad/Desktop/MODEVA/CMS/modeva-cms-backend && migrate -path ./migrations/ecommerce -database '$(NEON_ECOMMERCE_DB_URL)' force 0" 2>/dev/null || true; \
 		echo "Running Ecommerce migrations..."; \
 		wsl -d Ubuntu bash -lc "cd /mnt/c/Users/Jajad/Desktop/MODEVA/CMS/modeva-cms-backend && migrate -path ./migrations/ecommerce -database '$(NEON_ECOMMERCE_DB_URL)' up" || echo "  ⚠️  Ecommerce: Migration issue (may already be up-to-date)"; \
 		echo "✅ Neon migrations complete"; \
