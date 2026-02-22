@@ -109,10 +109,10 @@ func initGORM() {
 		log.Fatalf("❌ Failed to connect to CMS database with GORM: %v", err)
 	}
 	if sqlDB, err := CmsGorm.DB(); err == nil {
-		sqlDB.SetMaxOpenConns(5)
-		sqlDB.SetMaxIdleConns(2)
-		sqlDB.SetConnMaxLifetime(5 * time.Minute)
-		sqlDB.SetConnMaxIdleTime(2 * time.Minute)
+		sqlDB.SetMaxOpenConns(10)
+		sqlDB.SetMaxIdleConns(5)
+		sqlDB.SetConnMaxLifetime(30 * time.Minute)
+		sqlDB.SetConnMaxIdleTime(10 * time.Minute)
 	}
 	log.Println("✅ CMS database connected (GORM)")
 
@@ -174,7 +174,7 @@ func CloseDB() {
 
 // WithTimeout returns a context with a 10s timeout (bumped from 5s for Neon cold starts)
 func WithTimeout() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), 10*time.Second)
+	return context.WithTimeout(context.Background(), 5*time.Second)
 }
 
 func WithCustomTimeout(duration time.Duration) (context.Context, context.CancelFunc) {
