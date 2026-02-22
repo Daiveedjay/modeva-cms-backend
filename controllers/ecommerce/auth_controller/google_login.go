@@ -27,23 +27,12 @@ func GoogleLogin(c *gin.Context) {
 		cookieDomain = ".modeva.shop"
 	}
 
-	// Generate state token
 	state := uuid.New().String()
 
-	log.Printf("🔐 Setting state cookie: %s", state)
-
+	// Lax is fine here - Google redirect back is a top-level navigation
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(
-		"oauth_state",
-		state,
-		3600,
-		"/",
-		cookieDomain,
-		isProd,
-		true,
-	)
+	c.SetCookie("oauth_state", state, 3600, "/", cookieDomain, isProd, true)
 
-	// Generate OAuth URL and redirect
 	url := config.GoogleOAuthConfig.AuthCodeURL(state)
 	log.Printf("🔗 Redirecting to Google OAuth")
 

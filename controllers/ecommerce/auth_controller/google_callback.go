@@ -37,6 +37,9 @@ func GoogleCallback(c *gin.Context) {
 		cookieDomain = ".modeva.shop"
 	}
 
+	// Must be set before ANY SetCookie calls so all cookies get SameSite=None
+	c.SetSameSite(http.SameSiteNoneMode)
+
 	state := c.Query("state")
 	savedState, err := c.Cookie("oauth_state")
 	if err != nil || state != savedState {
@@ -121,7 +124,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	// Set auth_token cookie (httpOnly - readable by server)
+	// Set auth_token cookie (httpOnly - readable by server only)
 	c.SetCookie(
 		"auth_token",
 		jwtToken,
