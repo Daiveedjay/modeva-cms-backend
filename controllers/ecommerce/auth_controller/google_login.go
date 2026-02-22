@@ -30,7 +30,12 @@ func GoogleLogin(c *gin.Context) {
 	state := uuid.New().String()
 
 	// Lax is fine here - Google redirect back is a top-level navigation
-	c.SetSameSite(http.SameSiteLaxMode)
+	// Set SameSite based on environment
+	if isProd {
+		c.SetSameSite(http.SameSiteNoneMode)
+	} else {
+		c.SetSameSite(http.SameSiteLaxMode)
+	}
 	c.SetCookie("oauth_state", state, 3600, "/", cookieDomain, isProd, true)
 
 	url := config.GoogleOAuthConfig.AuthCodeURL(state)

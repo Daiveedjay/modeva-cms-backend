@@ -37,8 +37,13 @@ func GoogleCallback(c *gin.Context) {
 		cookieDomain = ".modeva.shop"
 	}
 
-	// Must be set before ANY SetCookie calls so all cookies get SameSite=None
-	c.SetSameSite(http.SameSiteNoneMode)
+	// SameSite=None requires Secure=true (HTTPS), only valid in production
+	// Locally over HTTP, use Lax so cookies are accepted by the browser
+	if isProd {
+		c.SetSameSite(http.SameSiteNoneMode)
+	} else {
+		c.SetSameSite(http.SameSiteLaxMode)
+	}
 
 	state := c.Query("state")
 	savedState, err := c.Cookie("oauth_state")

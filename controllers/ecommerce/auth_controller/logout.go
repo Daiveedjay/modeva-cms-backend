@@ -23,7 +23,13 @@ func Logout(c *gin.Context) {
 		cookieDomain = ".modeva.shop"
 	}
 
-	c.SetSameSite(http.SameSiteNoneMode)
+	// SameSite=None requires Secure=true (HTTPS), only valid in production
+	// Locally over HTTP, use Lax so cookies are cleared by the browser
+	if isProd {
+		c.SetSameSite(http.SameSiteNoneMode)
+	} else {
+		c.SetSameSite(http.SameSiteLaxMode)
+	}
 
 	c.SetCookie("auth_token", "", -1, "/", cookieDomain, isProd, true)
 	c.SetCookie("user_data", "", -1, "/", cookieDomain, isProd, false)
