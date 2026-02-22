@@ -5,6 +5,7 @@ package auth_controller
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/config"
 	"github.com/gin-gonic/gin"
@@ -20,31 +21,31 @@ import (
 // @Failure 500 {object} models.ApiResponse "Internal server error"
 // @Router /auth/google/login [get]
 func GoogleLogin(c *gin.Context) {
+	isProd := os.Getenv("APP_ENV") == "production"
+	cookieDomain := ""
+	if isProd {
+		cookieDomain = ".modeva.shop"
+	}
+
 	// Generate state token
 	state := uuid.New().String()
 
 	log.Printf("🔐 Setting state cookie: %s", state)
 
-	// Set cookie with better settings
+	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(
-		"oauth_state", // name
-		state,         // value
-		3600,          // maxAge (1 hour)
-		"/",           // path
-		"",            // domain (empty = current domain)
-		false,         // secure (false for localhost)
-		true,          // httpOnly
+		"oauth_state",
+		state,
+		3600,
+		"/",
+		cookieDomain,
+		isProd,
+		true,
 	)
 
-	// Also set as SameSite=Lax for better compatibility
-	c.SetSameSite(http.SameSiteLaxMode)
-
-	// Generate OAuth URL
+	// Generate OAuth URL and redirect
 	url := config.GoogleOAuthConfig.AuthCodeURL(state)
+	log.Printf("🔗 Redirecting to Google OAuth")
 
-	log.Printf("🔗 Redirecting to: %s", url)
-	log.Printf("🍪 State cookie should be set: %s", state)
-
-	// Redirect to Google
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }

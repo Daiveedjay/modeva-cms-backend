@@ -31,6 +31,12 @@ import (
 // @Failure 500 {object} models.ApiResponse "Internal server error"
 // @Router /auth/google/callback [get]
 func GoogleCallback(c *gin.Context) {
+	isProd := os.Getenv("APP_ENV") == "production"
+	cookieDomain := ""
+	if isProd {
+		cookieDomain = ".modeva.shop"
+	}
+
 	state := c.Query("state")
 	savedState, err := c.Cookie("oauth_state")
 	if err != nil || state != savedState {
@@ -40,7 +46,7 @@ func GoogleCallback(c *gin.Context) {
 	}
 
 	// Clear state cookie
-	c.SetCookie("oauth_state", "", -1, "/", "", false, true)
+	c.SetCookie("oauth_state", "", -1, "/", cookieDomain, isProd, true)
 
 	code := c.Query("code")
 	if code == "" {
@@ -74,11 +80,6 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	log.Println("════════════════════════════════════════════════════════")
-	log.Println("📋 FULL RAW GOOGLE API RESPONSE:")
-	log.Println(string(body))
-	log.Println("════════════════════════════════════════════════════════")
-
 	var googleUser models.GoogleUserInfo
 	if err := json.Unmarshal(body, &googleUser); err != nil {
 		log.Printf("❌ Decode failed: %v", err)
@@ -98,8 +99,6 @@ func GoogleCallback(c *gin.Context) {
 	}
 
 	emailVerified := googleUser.EmailVerified || googleUser.VerifiedEmail
-	log.Printf("🔍 Email verification - EmailVerified: %v, VerifiedEmail: %v, Final: %v",
-		googleUser.EmailVerified, googleUser.VerifiedEmail, emailVerified)
 	log.Printf("✅ Got user: %s (Google ID: %s, Verified: %v)", googleUser.Email, googleID, emailVerified)
 
 	user, err := createOrUpdateUser(c, &googleUser, googleID, emailVerified)
@@ -122,26 +121,16 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	// Log env and computed frontend URL before redirect
-	frontendEnv := os.Getenv("ECOMMERCE_FRONTEND_URL")
-	chosenFrontend := config.GetFrontendURL()
-
-	log.Printf("🔎 Backend ENV FRONTEND URL: %q", frontendEnv)
-	log.Printf("➡️ Backend will redirect to frontend URL: %q", chosenFrontend)
-
-	// Set HTTP-only cookie with the token
-	isProd := os.Getenv("ENV") == "production"
+	// Set auth_token cookie (httpOnly - readable by server)
 	c.SetCookie(
 		"auth_token",
 		jwtToken,
-		24*60*60, // 24 hours
+		24*60*60,
 		"/",
-		"",
+		cookieDomain,
 		isProd,
-		true, // httpOnly
+		true,
 	)
-
-	log.Println("✓ Auth cookie set")
 
 	// Prepare user response
 	userResponse := models.UserResponse{
@@ -155,26 +144,24 @@ func GoogleCallback(c *gin.Context) {
 		CreatedAt:     user.CreatedAt,
 	}
 
-	// Set temporary cookie with user data (for popup to read)
+	// Set temporary user_data cookie (NOT httpOnly - popup needs to read it)
 	userJSON, _ := json.Marshal(userResponse)
 	c.SetCookie(
 		"user_data",
 		string(userJSON),
-		60, // 1 minute (just for transfer)
+		60,
 		"/",
-		"",
+		cookieDomain,
 		isProd,
-		false, // NOT httpOnly (popup needs to read it)
+		false,
 	)
 
 	log.Printf("✅ Login successful: %s (verified: %v)", user.Email, emailVerified)
 
-	// Redirect to frontend callback (NO token in URL)
+	// Redirect to frontend auth-popup page
 	frontendURL := config.GetFrontendURL()
-
 	redirectURL := fmt.Sprintf("%s/auth-popup", frontendURL)
-
-	log.Printf("Using redirect URI: %s", config.GoogleOAuthConfig.RedirectURL)
+	log.Printf("➡️  Redirecting to: %s", redirectURL)
 
 	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }
