@@ -12,7 +12,7 @@ import (
 // SetupUserRoutes sets up all user profile routes
 func SetupUserRoutes(router *gin.RouterGroup) {
 	user := router.Group("/user")
-	user.Use(middleware.AuthMiddleware()) // All routes require auth
+	user.Use(middleware.UserAuthMiddleware()) // All routes require auth
 	{
 
 		user.GET("/", profile_controller.GetProfile)
