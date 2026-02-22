@@ -17,28 +17,16 @@ import (
 // @Success 200 {object} map[string]string "Logged out"
 // @Router /auth/logout [post]
 func Logout(c *gin.Context) {
-	isProd := os.Getenv("ENV") == "production"
-	// delete auth_token (must match name, path, domain, secure, httpOnly)
-	c.SetCookie(
-		"auth_token",
-		"",
-		-1, // MaxAge < 0 -> delete
-		"/",
-		"",
-		isProd,
-		true, // HttpOnly (same as when set)
-	)
+	isProd := os.Getenv("APP_ENV") == "production"
+	cookieDomain := ""
+	if isProd {
+		cookieDomain = ".modeva.shop"
+	}
 
-	// also clear the user_data helper cookie
-	c.SetCookie(
-		"user_data",
-		"",
-		-1,
-		"/",
-		"",
-		isProd,
-		false, // same as when set (NOT HttpOnly)
-	)
+	c.SetSameSite(http.SameSiteNoneMode)
+
+	c.SetCookie("auth_token", "", -1, "/", cookieDomain, isProd, true)
+	c.SetCookie("user_data", "", -1, "/", cookieDomain, isProd, false)
 
 	c.JSON(http.StatusOK, gin.H{"message": "logged out"})
 }
