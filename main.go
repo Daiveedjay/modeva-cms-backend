@@ -8,7 +8,6 @@ import (
 
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/config"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/controllers/cms/product_controller"
-	_ "github.com/Modeva-Ecommerce/modeva-cms-backend/controllers/cms/product_controller"
 	_ "github.com/Modeva-Ecommerce/modeva-cms-backend/docs"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/middleware"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/routes/cms_routes"
@@ -75,7 +74,7 @@ func main() {
 
 	// Register CMS routes (at /api/v1/admin prefix)
 	adminGroup := api.Group("/admin")
-	adminGroup.Use(middleware.RateLimiter(100, time.Minute))
+	adminGroup.Use(middleware.RateLimiter(1000, time.Minute))
 	cms_routes.SetupCategoryRoutes(adminGroup)
 	cms_routes.SetupProductRoutes(adminGroup)
 	cms_routes.SetupOrderRoutes(adminGroup)
