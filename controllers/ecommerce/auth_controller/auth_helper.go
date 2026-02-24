@@ -3,6 +3,7 @@ package auth_controller
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/config"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/models"
@@ -79,6 +80,7 @@ func createOrUpdateUser(
 
 func redirectToFrontendWithError(c *gin.Context, errorMsg string) {
 	frontendURL := config.GetFrontendURL()
-	redirectURL := fmt.Sprintf("%s/auth/error?message=%s", frontendURL, errorMsg)
+	// Redirect to auth-popup with error param so the popup can send AUTH_ERROR to parent
+	redirectURL := fmt.Sprintf("%s/auth-popup?error=%s", frontendURL, url.QueryEscape(errorMsg))
 	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }

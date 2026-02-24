@@ -8,20 +8,30 @@ import (
 )
 
 type User struct {
-	ID              uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey"`
-	Email           string     `json:"email" gorm:"type:varchar(255);uniqueIndex;not null"`
-	Name            string     `json:"name" gorm:"type:varchar(255);not null"`
-	GoogleID        string     `json:"googleId" gorm:"column:google_id;type:varchar(255);uniqueIndex;not null"`
-	Provider        string     `json:"provider" gorm:"type:varchar(50);default:'google'"`
-	Phone           *string    `json:"phone,omitempty" gorm:"type:varchar(50);index:idx_users_phone,where:phone IS NOT NULL"`
-	Status          string     `json:"status" gorm:"type:varchar(50);default:'active';index"`
-	EmailVerified   bool       `json:"emailVerified" gorm:"column:email_verified;default:true"`
-	Avatar          *string    `json:"avatar,omitempty" gorm:"type:text"`
-	CreatedAt       time.Time  `json:"createdAt" gorm:"autoCreateTime;index"`
-	UpdatedAt       time.Time  `json:"updatedAt" gorm:"autoUpdateTime"`
-	BanReason       *string    `json:"banReason,omitempty" gorm:"column:ban_reason;type:text"`
+	ID            uuid.UUID `json:"id" gorm:"type:uuid;primaryKey"`
+	Email         string    `json:"email" gorm:"type:varchar(255);uniqueIndex;not null"`
+	Name          string    `json:"name" gorm:"type:varchar(255);not null"`
+	GoogleID      string    `json:"googleId" gorm:"column:google_id;type:varchar(255);uniqueIndex;not null"`
+	Provider      string    `json:"provider" gorm:"type:varchar(50);default:'google'"`
+	Phone         *string   `json:"phone,omitempty" gorm:"type:varchar(50);index:idx_users_phone,where:phone IS NOT NULL"`
+	Status        string    `json:"status" gorm:"type:varchar(50);default:'active';index"`
+	EmailVerified bool      `json:"emailVerified" gorm:"column:email_verified;default:true"`
+	Avatar        *string   `json:"avatar,omitempty" gorm:"type:text"`
+	CreatedAt     time.Time `json:"createdAt" gorm:"autoCreateTime;index"`
+	UpdatedAt     time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
+
+	// Ban fields
+	IsBanned  bool       `json:"isBanned" gorm:"column:is_banned;default:false;index"`
+	BanReason *string    `json:"banReason,omitempty" gorm:"column:ban_reason;type:text"`
+	BannedAt  *time.Time `json:"bannedAt,omitempty" gorm:"column:banned_at"`
+
+	// Suspension fields (temporary ban)
 	SuspendedUntil  *time.Time `json:"suspendedUntil,omitempty" gorm:"column:suspended_until"`
 	SuspendedReason *string    `json:"suspendedReason,omitempty" gorm:"column:suspended_reason;type:text"`
+
+	// Soft delete fields
+	DeletedAt      *time.Time `json:"deletedAt,omitempty" gorm:"column:deleted_at;index"`
+	DeletionReason *string    `json:"deletionReason,omitempty" gorm:"column:deletion_reason;type:text"`
 
 	// Relationships
 	Addresses      []Address           `json:"addresses,omitempty" gorm:"foreignKey:UserID"`
@@ -128,4 +138,31 @@ type UserOverviewResponse struct {
 	CompletedOrders int                  `json:"completed_orders"`
 	LoyaltyPoints   int                  `json:"loyalty_points"`
 	RecentOrders    []RecentOrderSummary `json:"recent_orders"`
+}
+
+// BanCustomerRequest represents the request to ban a customer
+type BanCustomerRequest struct {
+	Reason string `json:"reason" binding:"required" example:"Violated terms of service"`
+}
+
+// BanCustomerResponse represents the response after banning a customer
+type BanCustomerResponse struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	BannedAt  string `json:"banned_at"`
+	BanReason string `json:"ban_reason"`
+}
+
+// DeleteCustomerRequest represents the request to delete a customer
+type DeleteCustomerRequest struct {
+	Reason string `json:"reason" binding:"required" example:"Data deletion request"`
+}
+
+// DeleteCustomerResponse represents the response after deleting a customer
+type DeleteCustomerResponse struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	DeletedAt      string `json:"deleted_at"`
+	DeletionReason string `json:"deletion_reason"`
 }

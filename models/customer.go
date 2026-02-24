@@ -88,3 +88,31 @@ type CustomerStats struct {
 	ActiveCustomersPercentage    float64 `json:"active_customers_percentage"`     // % of total customers
 	AvgOrderValue                float64 `json:"avg_order_value"`                 // Average order value in cents
 }
+
+// SendCustomerEmailRequest represents the request to send an email to a customer
+type SendCustomerEmailRequest struct {
+	Subject string `json:"subject" binding:"required" example:"Important Update"`
+	Message string `json:"message" binding:"required" example:"Your order has been shipped"`
+}
+
+// SendCustomerEmailResponse represents the response after sending email
+type SendCustomerEmailResponse struct {
+	Email     string `json:"email"`
+	Subject   string `json:"subject"`
+	SentAt    string `json:"sent_at"`
+	MessageID string `json:"message_id,omitempty"`
+}
+
+// UnbanCustomerRequest represents the request to unban a customer
+type UnbanCustomerRequest struct {
+	Reason string `json:"reason" binding:"required" example:"Appeal accepted"`
+}
+
+// UnbanCustomerResponse represents the response after unbanning a customer
+type UnbanCustomerResponse struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	UnbannedAt  string `json:"unbanned_at"`
+	UnbanReason string `json:"unban_reason"`
+}

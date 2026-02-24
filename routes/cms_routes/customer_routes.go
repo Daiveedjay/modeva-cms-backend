@@ -27,6 +27,14 @@ func SetupCustomerRoutes(rg *gin.RouterGroup) {
 	{
 		// Update customer details
 		protected.PATCH("/:id", customer_controller.UpdateCustomerDetails)
+		protected.POST("/:id/send-email", customer_controller.SendCustomerEmail)
+
+		// Ban customer
+		protected.POST("/:id/ban", customer_controller.BanCustomer)
+		protected.POST("/:id/unban", customer_controller.UnbanCustomer)
+
+		// Delete customer
+		protected.DELETE("/:id", customer_controller.DeleteCustomer)
 
 		// Add other write operations here as needed (ban, suspend, delete, etc.)
 		// protected.POST("/:id/ban", customer_controller.BanCustomer)
