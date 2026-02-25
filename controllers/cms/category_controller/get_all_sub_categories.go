@@ -3,7 +3,6 @@ package category_controller
 import (
 	"net/http"
 
-	category_cache "github.com/Modeva-Ecommerce/modeva-cms-backend/cache"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/config"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/models"
 	"github.com/gin-gonic/gin"
@@ -18,19 +17,14 @@ import (
 // @Failure 500 {object} models.ApiResponse
 // @Router /api/v1/admin/categories/children [get]
 func GetAllSubCategories(c *gin.Context) {
-	// Try cache first
-	subCategories, ok := category_cache.GetSubs()
-	if !ok {
-		// Cache miss — fetch from DB
-		if err := config.CmsGorm.
-			Where("parent_id IS NOT NULL").
-			Preload("Parent").
-			Order("parent_name ASC, name ASC").
-			Find(&subCategories).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to fetch sub-categories"))
-			return
-		}
-		category_cache.SetSubs(subCategories)
+	var subCategories []models.Category
+	if err := config.CmsGorm.
+		Where("parent_id IS NOT NULL").
+		Preload("Parent").
+		Order("parent_name ASC, name ASC").
+		Find(&subCategories).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to fetch sub-categories"))
+		return
 	}
 
 	response := make([]models.CategoryWithPath, 0, len(subCategories))

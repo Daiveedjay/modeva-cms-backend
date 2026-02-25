@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	category_cache "github.com/Modeva-Ecommerce/modeva-cms-backend/cache"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/config"
 	"github.com/Modeva-Ecommerce/modeva-cms-backend/models"
 	"github.com/gin-gonic/gin"
@@ -32,54 +31,46 @@ func GetCategories(c *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	// Try cache first
-	parents, productCounts, ok := category_cache.GetTree()
-	if !ok {
-		// Cache miss — fetch from DB
-		if err := config.CmsGorm.
-			Where("parent_id IS NULL").
-			Order("created_at ASC").
-			Preload("Children", func(db *gorm.DB) *gorm.DB {
-				return db.Order("created_at ASC")
-			}).
-			Find(&parents).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to fetch categories"))
-			return
-		}
-
-		// Collect all IDs for product count query
-		categoryIDs := make([]string, 0, len(parents)*4)
-		for _, p := range parents {
-			categoryIDs = append(categoryIDs, p.ID.String())
-			for _, child := range p.Children {
-				categoryIDs = append(categoryIDs, child.ID.String())
-			}
-		}
-
-		productCounts = make(map[string]int)
-		if len(categoryIDs) > 0 {
-			type CountResult struct {
-				SubCategoryID string `gorm:"column:sub_category_id"`
-				Count         int    `gorm:"column:count"`
-			}
-			var counts []CountResult
-			if err := config.CmsGorm.Table("products").
-				Select("sub_category_id, COUNT(*) as count").
-				Where("sub_category_id IN ?", categoryIDs).
-				Group("sub_category_id").
-				Scan(&counts).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count products"))
-				return
-			}
-			for _, cr := range counts {
-				productCounts[cr.SubCategoryID] = cr.Count
-			}
-		}
-
-		category_cache.SetTree(parents, productCounts)
+	var parents []models.Category
+	if err := config.CmsGorm.
+		Where("parent_id IS NULL").
+		Order("created_at ASC").
+		Preload("Children", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at ASC")
+		}).
+		Find(&parents).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to fetch categories"))
+		return
 	}
 
-	// Apply pagination in-memory (data is already cached)
+	categoryIDs := make([]string, 0, len(parents)*4)
+	for _, p := range parents {
+		categoryIDs = append(categoryIDs, p.ID.String())
+		for _, child := range p.Children {
+			categoryIDs = append(categoryIDs, child.ID.String())
+		}
+	}
+
+	productCounts := make(map[string]int)
+	if len(categoryIDs) > 0 {
+		type CountResult struct {
+			SubCategoryID string `gorm:"column:sub_category_id"`
+			Count         int    `gorm:"column:count"`
+		}
+		var counts []CountResult
+		if err := config.CmsGorm.Table("products").
+			Select("sub_category_id, COUNT(*) as count").
+			Where("sub_category_id IN ?", categoryIDs).
+			Group("sub_category_id").
+			Scan(&counts).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse(c, "Failed to count products"))
+			return
+		}
+		for _, cr := range counts {
+			productCounts[cr.SubCategoryID] = cr.Count
+		}
+	}
+
 	total := int64(len(parents))
 	start := offset
 	end := offset + limit
@@ -91,7 +82,6 @@ func GetCategories(c *gin.Context) {
 	}
 	paginated := parents[start:end]
 
-	// Build response
 	response := make([]models.CategoryWithProducts, len(paginated))
 	for i, parent := range paginated {
 		parentProductCount := 0

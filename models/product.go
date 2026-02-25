@@ -32,7 +32,7 @@ type ProductVariant struct {
 type InventoryField struct {
 	Combo       []string `json:"combo" binding:"required" example:"['Small', 'Black']"`
 	VariantName string   `json:"variant_name" binding:"required" example:"Small-Black"`
-	Quantity    int      `json:"quantity" binding:"required,min=0" example:"100"`
+	Quantity    int      `json:"quantity" binding:"gte=0" example:"0"`
 }
 
 // Create custom types for slices (so we can add methods)
