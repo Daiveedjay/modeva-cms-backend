@@ -190,6 +190,10 @@ func GetOrderDetailsByID(c *gin.Context) {
 		}
 	}
 
+	// Make it an empty string if no orders (to avoid null in JSON)
+	if len(items) == 0 {
+		items = []models.OrderItemWithImage{}
+	}
 	res.Items = items
 
 	log.Printf("[admin.order-details] Responding with order %s", res.OrderNumber)

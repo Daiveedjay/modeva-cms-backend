@@ -9,26 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetupAdminRoutes sets up all admin routes with appropriate middleware
 func SetupAdminRoutes(rg *gin.RouterGroup) {
-	// ════════════════════════════════════════════════════════════
-	// Base Admin Group
-	// ════════════════════════════════════════════════════════════
-
 	admin := rg.Group("/admin")
 
 	// ════════════════════════════════════════════════════════════
-	// Public Routes (No Auth Required)
+	// Public Routes
 	// ════════════════════════════════════════════════════════════
-
-	// Auth
 	admin.POST("/login", admin_auth.AdminLogin)
 	admin.POST("/accept-invite", admin_auth.AcceptAdminInvite)
 
 	// ════════════════════════════════════════════════════════════
-	// Protected Routes (Auth Required)
+	// Protected Routes
 	// ════════════════════════════════════════════════════════════
-
 	protected := admin.Group("")
 	protected.Use(middleware.AdminAuthMiddleware())
 	{
@@ -39,38 +31,31 @@ func SetupAdminRoutes(rg *gin.RouterGroup) {
 		// Profile
 		protected.PATCH("/profile", admin_controller.UpdateAdminProfile)
 
-		// Admins
-		protected.GET("/admins", admin_controller.GetAdmins)
-		protected.GET("/admins/:id", admin_controller.GetAdmin)
+		// Stats (static — before /:id)
+		protected.GET("/stats", admin_controller.GetAdminStats)
 
-		// Activity logs
+		// Admins — static routes before wildcard
+		protected.GET("/admins", admin_controller.GetAdmins)
 		protected.GET("/admins/activity-logs", admin_controller.GetAllAdminActivityLogs)
 		protected.GET("/admins/activity-logs/search", admin_controller.SearchAdminActivityLogs)
+		protected.GET("/admins/:id", admin_controller.GetAdmin)
 		protected.GET("/admins/:id/activity-logs", admin_controller.GetSingleAdminActivityLogs)
-
-		// Stats
-		protected.GET("/stats", admin_controller.GetAdminStats)
 
 		// Orders
 		protected.POST("/orders/:id/send-invoice", order_controller.SendOrderInvoicePDF)
 		protected.GET("/orders/:id/download-invoice", order_controller.DownloadOrderInvoicePDF)
-
 	}
 
 	// ════════════════════════════════════════════════════════════
 	// Super Admin Only Routes
 	// ════════════════════════════════════════════════════════════
-
 	superAdmin := admin.Group("")
 	superAdmin.Use(
 		middleware.AdminAuthMiddleware(),
 		middleware.RequireSuperAdminMiddleware(),
 	)
 	{
-		// Invitations
 		superAdmin.POST("/invite", admin_auth.CreateAdminInvite)
-
-		// Admin management
 		superAdmin.POST("/admins/:id/suspend", admin_controller.SuspendAdmin)
 		superAdmin.POST("/admins/:id/unsuspend", admin_controller.UnsuspendAdmin)
 	}

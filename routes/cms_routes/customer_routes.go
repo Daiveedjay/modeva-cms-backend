@@ -9,35 +9,24 @@ import (
 func SetupCustomerRoutes(rg *gin.RouterGroup) {
 	customer := rg.Group("/customers")
 
-	// ════════════════════════════════════════════════════════════
-	// Public Routes (No Auth Required)
-	// ════════════════════════════════════════════════════════════
+	// ── Static routes FIRST ──────────────────────────────────
 	customer.GET("", customer_controller.GetCustomers)
-	customer.GET("/:id", customer_controller.GetCustomerDetailsByID)
-	customer.GET("/:id/orders", customer_controller.GetCustomerOrders)
 	customer.GET("/search", customer_controller.SearchCustomers)
 	customer.GET("/stats", customer_controller.GetCustomerStats)
 
-	// ════════════════════════════════════════════════════════════
-	// Protected Routes (Auth + Activity Logging)
-	// ════════════════════════════════════════════════════════════
+	// ── Wildcard routes AFTER ────────────────────────────────
+	customer.GET("/:id", customer_controller.GetCustomerDetailsByID)
+	customer.GET("/:id/orders", customer_controller.GetCustomerOrders)
+
+	// ── Protected ────────────────────────────────────────────
 	protected := customer.Group("")
 	protected.Use(middleware.AdminAuthMiddleware())
 	protected.Use(middleware.ActivityLoggingMiddleware())
 	{
-		// Update customer details
 		protected.PATCH("/:id", customer_controller.UpdateCustomerDetails)
 		protected.POST("/:id/send-email", customer_controller.SendCustomerEmail)
-
-		// Ban customer
 		protected.POST("/:id/ban", customer_controller.BanCustomer)
 		protected.POST("/:id/unban", customer_controller.UnbanCustomer)
-
-		// Delete customer
 		protected.DELETE("/:id", customer_controller.DeleteCustomer)
-
-		// Add other write operations here as needed (ban, suspend, delete, etc.)
-		// protected.POST("/:id/ban", customer_controller.BanCustomer)
-		// protected.DELETE("/:id", customer_controller.DeleteCustomer)
 	}
 }

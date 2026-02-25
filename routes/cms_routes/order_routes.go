@@ -10,21 +10,24 @@ func SetupOrderRoutes(rg *gin.RouterGroup) {
 	order := rg.Group("/orders")
 
 	// ════════════════════════════════════════════════════════════
-	// Public Routes (No Auth Required)
+	// Public Routes
 	// ════════════════════════════════════════════════════════════
+
+	// Static routes first
 	order.GET("", order_controller.GetOrders)
-	order.GET("/:id", order_controller.GetOrderDetailsByID)
 	order.GET("/stats", order_controller.GetOrderStats)
 	order.GET("/search", order_controller.SearchOrders)
 
+	// Wildcard after
+	order.GET("/:id", order_controller.GetOrderDetailsByID)
+
 	// ════════════════════════════════════════════════════════════
-	// Protected Routes (Auth + Activity Logging)
+	// Protected Routes
 	// ════════════════════════════════════════════════════════════
 	protected := order.Group("")
 	protected.Use(middleware.AdminAuthMiddleware())
 	protected.Use(middleware.ActivityLoggingMiddleware())
 	{
-		// Update order status (only write operation for orders)
 		protected.PATCH("/:id/status", order_controller.UpdateOrderStatus)
 	}
 }

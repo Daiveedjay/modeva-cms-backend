@@ -90,7 +90,7 @@ func GetCustomerOrders(c *gin.Context) {
 	// ================================
 	// Data query
 	// ================================
-	var out []models.CMSCustomerOrderRow
+	out := make([]*models.CMSCustomerOrderRow, 0)
 
 	dataSQL := `
 	SELECT

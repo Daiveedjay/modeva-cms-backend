@@ -10,30 +10,27 @@ func SetupProductRoutes(rg *gin.RouterGroup) {
 	product := rg.Group("/products")
 
 	// ════════════════════════════════════════════════════════════
-	// Public Routes (No Auth Required)
+	// Public Routes
 	// ════════════════════════════════════════════════════════════
+
+	// Static routes first
 	product.GET("", product_controller.GetProducts)
-	product.GET("/:id", product_controller.GetProductByID)
 	product.GET("/stats", product_controller.GetProductStats)
 	product.GET("/search", product_controller.SearchProducts)
 
+	// Wildcard after
+	product.GET("/:id", product_controller.GetProductByID)
+
 	// ════════════════════════════════════════════════════════════
-	// Protected Routes (Auth + Activity Logging)
+	// Protected Routes
 	// ════════════════════════════════════════════════════════════
 	protected := product.Group("")
 	protected.Use(middleware.AdminAuthMiddleware())
 	protected.Use(middleware.ActivityLoggingMiddleware())
 	{
-		// Create
 		protected.POST("", product_controller.CreateProduct)
-
-		// Update
-		protected.PATCH("/:id", product_controller.UpdateProduct)
-
-		// Delete
-		protected.DELETE("/:id", product_controller.DeleteProduct)
-
-		// Utility (cleanup - still needs auth + logging)
 		protected.POST("/cleanup-folder", product_controller.CleanupOrphanedFolder)
+		protected.PATCH("/:id", product_controller.UpdateProduct)
+		protected.DELETE("/:id", product_controller.DeleteProduct)
 	}
 }
