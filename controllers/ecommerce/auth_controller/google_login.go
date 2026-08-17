@@ -24,7 +24,7 @@ func GoogleLogin(c *gin.Context) {
 	isProd := os.Getenv("APP_ENV") == "production"
 	cookieDomain := ""
 	if isProd {
-		cookieDomain = ".modeva.shop"
+		cookieDomain = ".modeva.biz"
 	}
 
 	state := uuid.New().String()

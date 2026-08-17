@@ -34,7 +34,7 @@ func GoogleCallback(c *gin.Context) {
 	isProd := os.Getenv("APP_ENV") == "production"
 	cookieDomain := ""
 	if isProd {
-		cookieDomain = ".modeva.shop"
+		cookieDomain = ".modeva.biz"
 	}
 
 	// SameSite=None requires Secure=true (HTTPS), only valid in production

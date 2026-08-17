@@ -87,7 +87,7 @@ func (r *ResendClient) buildCustomerUnbanEmailHTML(data CustomerUnbanEmailData) 
             You now have full access to your account and can resume shopping. We appreciate your understanding during this time.
           </p>
           <div style="text-align: left; margin: 50px 0 60px 0;">
-            <a href="https://modeva.shop" style="display: inline-block; padding: 16px 32px; background: #000000; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.2s ease;">Continue Shopping</a>
+            <a href="https://modeva.biz" style="display: inline-block; padding: 16px 32px; background: #000000; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.2s ease;">Continue Shopping</a>
           </div>
           <hr style="border: 0; height: 1px; background: #e5e5e5; margin: 60px 0;" />
           <p style="font-size: 13px; color: #626262; line-height: 1.7; margin-top: 40px;">

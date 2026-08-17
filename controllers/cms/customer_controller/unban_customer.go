@@ -113,7 +113,7 @@ func UnbanCustomer(c *gin.Context) {
 	// Send unban notification email
 	supportEmail := os.Getenv("RESEND_FROM_EMAIL")
 	if supportEmail == "" {
-		supportEmail = "support@modeva.shop"
+		supportEmail = "support@modeva.biz"
 	}
 	go sendUnbanNotificationEmail(customer.Email, customer.Name, req.Reason, supportEmail)
 

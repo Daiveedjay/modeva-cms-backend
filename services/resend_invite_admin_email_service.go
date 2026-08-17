@@ -25,7 +25,7 @@ func NewResendClient() *ResendClient {
 
 	from := os.Getenv("RESEND_FROM_EMAIL")
 	if from == "" {
-		from = "noreply@contact.modeva.shop" // Default from address
+		from = "noreply@contact.modeva.biz" // Default from address
 	}
 
 	return &ResendClient{
@@ -151,7 +151,7 @@ func (r *ResendClient) buildAdminInviteHTML(data AdminInviteEmailData) string {
           <p style="font-size: 13px; color: #626262; line-height: 1.8; margin-bottom: 8px; margin-top: 0;">© 2026 Modeva. All rights reserved.</p>
           <p style="font-size: 13px; color: #626262; line-height: 1.8; margin-top: 0;">
             Questions?
-            <a href="mailto:support@modeva.shop" style="color: #0066cc; text-decoration: none; font-size: 13px; font-weight: 500;">Contact support</a>
+            <a href="mailto:support@modeva.biz" style="color: #0066cc; text-decoration: none; font-size: 13px; font-weight: 500;">Contact support</a>
           </p>
         </div>
       </div>
