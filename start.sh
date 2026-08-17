@@ -29,4 +29,7 @@ init_database "${ECOMMERCE_DB_URL}" "/app/migrations/ecommerce" "Ecommerce"
 
 echo "✅ Database initialization complete"
 echo "🚀 Starting application..."
-exec air -c .air.toml
+
+# Run the binary compiled at image build time. Air is a development-only
+# hot-reload tool and is not present in the production image.
+exec /app/modeva-api
