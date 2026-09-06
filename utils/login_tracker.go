@@ -26,9 +26,37 @@ func LogLoginEvent(c *gin.Context, userID uuid.UUID) error {
 	userAgent := c.GetHeader("User-Agent")
 
 	// Parse device info (basic)
-	deviceType := parseDeviceType(userAgent)
-	browser := parseBrowser(userAgent)
-	os := parseOS(userAgent)
+	// NOTE: inlined here to avoid three passes over the user agent on the hot
+	// login path. The helpers below are still used by the analytics backfill.
+	ua := strings.ToLower(userAgent)
+	deviceType := "desktop"
+	if strings.Contains(ua, "mobile") || strings.Contains(ua, "android") {
+		deviceType = "mobile"
+	} else if strings.Contains(ua, "tablet") || strings.Contains(ua, "ipad") {
+		deviceType = "tablet"
+	}
+	browser := "Other"
+	if strings.Contains(ua, "edg") {
+		browser = "Edge"
+	} else if strings.Contains(ua, "chrome") {
+		browser = "Chrome"
+	} else if strings.Contains(ua, "firefox") {
+		browser = "Firefox"
+	} else if strings.Contains(ua, "safari") {
+		browser = "Safari"
+	}
+	os := "Other"
+	if strings.Contains(ua, "windows") {
+		os = "Windows"
+	} else if strings.Contains(ua, "mac os") {
+		os = "macOS"
+	} else if strings.Contains(ua, "linux") {
+		os = "Linux"
+	} else if strings.Contains(ua, "android") {
+		os = "Android"
+	} else if strings.Contains(ua, "iphone") || strings.Contains(ua, "ipad") {
+		os = "iOS"
+	}
 
 	query := `
 		INSERT INTO login_events (
