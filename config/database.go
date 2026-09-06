@@ -27,7 +27,10 @@ const (
 	ecommerceConnMaxLifetime = 5 * time.Minute
 	ecommerceConnMaxIdleTime = 2 * time.Minute
 
-	defaultQueryTimeout = 5 * time.Second
+	// 10s rather than 5s because Neon suspends idle compute and a cold start
+	// can eat several seconds before the first row comes back. The previous
+	// comment on WithTimeout said this had been bumped; the code had not been.
+	defaultQueryTimeout = 10 * time.Second
 )
 
 // Local fallbacks, used only when no *_DB_URL is provided.

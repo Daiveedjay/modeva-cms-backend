@@ -3,11 +3,17 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+// devFallbackSecret keeps local development working without a JWT_SECRET. It is
+// a published constant, so a token signed with it is forgeable by anyone who
+// has read this file - which is why production refuses to start on it.
+const devFallbackSecret = "dev-secret-key-change-in-production"
 
 // AdminJWTClaims represents the JWT claims for admin tokens
 type AdminJWTClaims struct {
@@ -40,7 +46,13 @@ func GetJWTService() *JWTService {
 		// Fallback to environment variable if not initialized
 		secretKey := os.Getenv("JWT_SECRET")
 		if secretKey == "" {
-			secretKey = "dev-secret-key-change-in-production"
+			// Signing real admin tokens with a constant published in this
+			// repository is worse than not starting at all.
+			if os.Getenv("APP_ENV") == "production" {
+				log.Fatal("❌ JWT_SECRET must be set in production; refusing to sign tokens with the development fallback")
+			}
+			log.Println("⚠️ JWT_SECRET not set, using the development fallback - never deploy with this")
+			secretKey = devFallbackSecret
 		}
 		jwtService = &JWTService{secretKey: secretKey}
 	}

@@ -1,8 +1,6 @@
 module github.com/Modeva-Ecommerce/modeva-cms-backend
 
-go 1.24.0
-
-toolchain go1.24.10
+go 1.25.0
 
 replace github.com/Modeva-Ecommerce/modeva-cms-backend => ./
 
@@ -31,6 +29,7 @@ require (
 	github.com/johnfercher/maroto v1.0.0 // indirect
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
+	golang.org/x/term v0.45.0 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
 )
 
@@ -88,7 +87,7 @@ require (
 	golang.org/x/mod v0.30.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/tools v0.39.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect

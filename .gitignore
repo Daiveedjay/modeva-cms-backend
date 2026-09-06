@@ -36,3 +36,10 @@ api-test*/**
 # OS files
 .DS_Store
 Thumbs.db
+# Iris cache
+.iris-cache/
+.iris-snapshots
+
+# Air / build output
+tmp/
+iris-report.html

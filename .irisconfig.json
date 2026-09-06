@@ -1,0 +1,24 @@
+{
+  "functionLengthThreshold": 30,
+  "fileLengthThreshold": 320,
+  "maxFunctionsPerFile": 10,
+  "maxImportsPerFile": 8,
+  "maxParameterCount": 5,
+  "complexityThreshold": 7,
+  "enableConsoleLogWarnings": true,
+  "enableMagicNumberDetection": true,
+  "enableMissingReturnTypeWarnings": true,
+  "enableCodeLens": true,
+  "enableStatusBar": true,
+  "ignoreFiles": ["**/*.test.ts", "**/generated/**"],
+  "ignoreFunctions": ["main", "handler"],
+  "severityOverrides": {
+    "no-exports": "warning",
+    "file-too-long": "warning"
+  },
+  "sidebarFontSize": 14,
+  "fileNaming": {
+    "convention": "snake_case",
+    "ignore": []
+  }
+}
