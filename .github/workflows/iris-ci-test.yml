@@ -61,6 +61,42 @@ jobs:
           IRIS_LICENCE_TOKEN: ${{ secrets.IRIS_LICENCE_TOKEN }}
         run: iris gate . --config .iris-ci/gate-pass.json --format github
 
+      # The CLI posts evidence fire-and-forget and IGNORES the response, on
+      # purpose - evidence must never alter a local enforcement decision. The
+      # cost is that a rejected project id or a non-member token looks exactly
+      # like a successful send. This asks the same endpoint the same question
+      # and prints the status, so "nothing appeared in the dashboard" has an
+      # answer instead of a guess.
+      - name: Probe the evidence endpoint and report its status
+        if: always()
+        env:
+          IRIS_LICENCE_TOKEN: ${{ secrets.IRIS_LICENCE_TOKEN }}
+          PROJECT_ID: 01a08694-4a8c-7b3a-9afe-90a70c72a00b
+        run: |
+          status=$(curl -s -o /tmp/evidence.json -w '%{http_code}'             -X POST https://api.iriscode.co/api/v1/team-evidence/events             -H 'Content-Type: application/json'             -d "{
+              \"license_key\": \"$IRIS_LICENCE_TOKEN\",
+              \"project_id\": \"$PROJECT_ID\",
+              \"kind\": \"gate_run\",
+              \"source\": \"ci\",
+              \"audit_id\": \"$GITHUB_RUN_ID-probe\",
+              \"dedupe_key\": \"$GITHUB_RUN_ID-probe:gate_run\",
+              \"revision_sha\": \"$GITHUB_SHA\",
+              \"branch\": \"$GITHUB_REF_NAME\",
+              \"health_score\": 90,
+              \"findings_opened\": 0,
+              \"high_severity_count\": 0,
+              \"gate_rules_failed\": 0,
+              \"occurred_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+            }")
+          echo "evidence endpoint returned HTTP $status"
+          echo "response body:"; cat /tmp/evidence.json; echo
+          case "$status" in
+            200|201) echo "::notice::Evidence ACCEPTED. If the dashboard shows nothing, you are looking at the wrong workspace - this lands on the TEAM project, not Solo." ;;
+            401) echo "::error::Licence token rejected. IRIS_LICENCE_TOKEN is not a valid key." ;;
+            403|404) echo "::error::Project rejected. Either $PROJECT_ID is not a project in an organisation this token's user belongs to, or evidence is disabled on it." ;;
+            *)   echo "::error::Unexpected status $status from the evidence endpoint." ;;
+          esac
+
   gate-fail:
     name: gate (expected FAIL)
     runs-on: ubuntu-latest
