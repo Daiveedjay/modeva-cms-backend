@@ -1,4 +1,6 @@
 {
+  "$schema": "https://www.iriscode.co/schema/v1/irisconfig.schema.json",
+  "teamProjectId": "01a0870a-0377-7952-b918-775387a43a69",
   "functionLengthThreshold": 30,
   "fileLengthThreshold": 320,
   "maxFunctionsPerFile": 10,
@@ -10,8 +12,14 @@
   "enableMissingReturnTypeWarnings": true,
   "enableCodeLens": true,
   "enableStatusBar": true,
-  "ignoreFiles": ["**/*.test.ts", "**/generated/**"],
-  "ignoreFunctions": ["main", "handler"],
+  "ignoreFiles": [
+    "**/*.test.ts",
+    "**/generated/**"
+  ],
+  "ignoreFunctions": [
+    "main",
+    "handler"
+  ],
   "severityOverrides": {
     "no-exports": "warning",
     "file-too-long": "warning"
