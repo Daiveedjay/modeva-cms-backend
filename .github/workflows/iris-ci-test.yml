@@ -71,7 +71,7 @@ jobs:
         if: always()
         env:
           IRIS_LICENCE_TOKEN: ${{ secrets.IRIS_LICENCE_TOKEN }}
-          PROJECT_ID: 01a08694-4a8c-7b3a-9afe-90a70c72a00b
+          PROJECT_ID: 01a0870a-0377-7952-b918-775387a43a69
         run: |
           status=$(curl -s -o /tmp/evidence.json -w '%{http_code}'             -X POST https://api.iriscode.co/api/v1/team-evidence/events             -H 'Content-Type: application/json'             -d "{
               \"license_key\": \"$IRIS_LICENCE_TOKEN\",
