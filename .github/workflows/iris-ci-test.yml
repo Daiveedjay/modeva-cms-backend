@@ -1,0 +1,96 @@
+# TEMPORARY - a deliberate end-to-end test of the Iris Code CI evidence path.
+#
+# Delete this file, the .iris-ci/ directory, and the branch it lives on when the
+# test is done. Nothing here belongs on main.
+#
+# What it proves: `iris gate` running in CI records Team audit evidence against
+# the project named by teamProjectId - the health score, how many findings were
+# open, how many were high severity, and the commit and branch it audited. That
+# path shipped in 1.26.0 and is the one surface no manual pass could reach, so
+# it is the last unverified thing in the release.
+#
+# Two jobs on purpose, so the dashboard shows both outcomes:
+#
+#   gate-pass  thresholds deliberately wide open, so it passes whatever this
+#              repository currently scores
+#   gate-fail  minHealthScore 100 and gateMaxComplexity 0, so it fails whatever
+#              this repository currently scores
+#
+# Neither reflects a real standard. The repository's own .irisconfig.json is
+# untouched; both jobs pass --config so this test cannot change what the real
+# gate would say.
+
+name: Iris CI evidence test
+
+on:
+  push:
+    branches: [iris-ci-test]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate-pass:
+    name: gate (expected PASS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      # Pinned, because the point is to test the version that introduced
+      # evidence reporting rather than whatever latest happens to be.
+      - name: Install Iris CLI
+        run: npm install -g @iris-code/cli@1.18.0
+
+      - name: Confirm the licence token reached the runner
+        env:
+          IRIS_LICENCE_TOKEN: ${{ secrets.IRIS_LICENCE_TOKEN }}
+        run: |
+          if [ -z "$IRIS_LICENCE_TOKEN" ]; then
+            echo "::error::IRIS_LICENCE_TOKEN is empty. Without it the gate runs with Free limits and reports no evidence."
+            exit 1
+          fi
+          echo "Token present (${#IRIS_LICENCE_TOKEN} characters). Value never printed."
+
+      - name: Run the gate
+        env:
+          IRIS_LICENCE_TOKEN: ${{ secrets.IRIS_LICENCE_TOKEN }}
+        run: iris gate . --config .iris-ci/gate-pass.json --format github
+
+  gate-fail:
+    name: gate (expected FAIL)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Install Iris CLI
+        run: npm install -g @iris-code/cli@1.18.0
+
+      # continue-on-error, because this job failing is the expected result. The
+      # step below turns "the gate failed" into a pass for the workflow and
+      # "the gate passed" into a failure, so a thresholds-did-nothing bug cannot
+      # look like success.
+      - name: Run the gate, expecting a non-zero exit
+        id: gate
+        continue-on-error: true
+        env:
+          IRIS_LICENCE_TOKEN: ${{ secrets.IRIS_LICENCE_TOKEN }}
+        run: iris gate . --config .iris-ci/gate-fail.json --format github
+
+      - name: Assert the gate actually failed
+        run: |
+          if [ "${{ steps.gate.outcome }}" = "failure" ]; then
+            echo "Gate failed as expected - a failing run is now recorded as evidence."
+          else
+            echo "::error::The gate PASSED against minHealthScore 100 and gateMaxComplexity 0."
+            echo "::error::That means the thresholds were not applied, which is the bug this test exists to catch."
+            exit 1
+          fi

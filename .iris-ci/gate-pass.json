@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.iriscode.co/schema/v1/irisconfig.schema.json",
+  "teamProjectId": "01a08694-4a8c-7b3a-9afe-90a70c72a00b",
+  "minHealthScore": 1,
+  "gateMaxSecrets": 999,
+  "gateMaxComplexity": 999,
+  "gateMaxFileLength": 99999,
+  "gateMaxSmellsPerFile": 999,
+  "gateMaxSecuritySmells": 999,
+  "gateMaxSuppressions": 999,
+  "gateMaxDuplicateBlocks": 999,
+  "gateMaxNamingViolations": 999,
+  "gateMaxParseErrors": 999
+}
